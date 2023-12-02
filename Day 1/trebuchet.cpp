@@ -20,13 +20,15 @@ std::unordered_map<std::string, int> mapping = {
 
 std::pair<int, int> findOcc ( const std::string & haystack, const std::string & needle ) {
     size_t pos = 0;
-    int first = -1, last;
-    while ( pos != std::string::npos ) {
+    int first = -1, last = -1;
+    while ( 1 ) {
         pos = haystack.find(needle, pos);
+        if ( pos == std::string::npos ) 
+            break;
         if ( first == -1 ) first = pos;
-        else last = pos;
+        last = pos;
+        pos += 1;
     }
-
     return { first, last };
 }
 
@@ -54,21 +56,19 @@ int main ( void ) {
 
         for ( const auto & m : mapping ) {
             auto idx = findOcc ( s, m . first );
-            std::cout << m . first << " " << idx . first << " " << idx . second << std::endl;
             if ( idx . first != -1 && min > idx . first ) {
                 min = idx . first;
                 minVal = m . second;
             }
 
-            if ( idx . first != -1 && max < idx . first ) {
-                max = idx . first;
+            if ( idx . second != -1 && max < idx . second ) {
+                max = idx . second;
                 maxVal = m . second;
             }
         }
 
         r += minVal * 10 + maxVal;
-        std::cout << "=> " << r << std::endl;
     }
-    std::cout << r << std::endl;
+    std::cout << "=> " << r << std::endl;
     return 0;
 }
