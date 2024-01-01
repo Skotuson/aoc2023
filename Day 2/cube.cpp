@@ -21,30 +21,32 @@ std::vector<std::string> ssplit ( const std::string & str, const char delim ) {
     return r;
 }
 
-bool subgame ( const std::string & thrw ) {
+void subgame ( const std::string & thrw, size_t & minRed, size_t & minGreen, size_t & minBlue ) {
     auto dices = ssplit ( thrw, ',' );
     for ( const auto & dice : dices ) {
         auto split = ssplit ( dice.substr(1, dice.size()), ' ' );
-        if ( split[1] == "red" && std::stoi(split[0]) > RED )
-            return false;
-        if ( split[1] == "green" && std::stoi(split[0]) > GREEN )
-            return false;
-        if ( split[1] == "blue" && std::stoi(split[0]) > BLUE )
-            return false;   
+        size_t n = std::stoi(split[0]);
+        if ( split[1] == "red" ) 
+            minRed = std::max ( minRed, n );
+        if ( split[1] == "green" )
+            minGreen = std::max ( minGreen, n );
+        if ( split[1] == "blue" )
+            minBlue = std::max ( minBlue, n );
     }
-    return true;
 }
 
 size_t game ( const std::string & line ) {
     size_t r = 0;
-    auto split = ssplit ( line, ':' );  
-    auto throws = ssplit ( split[1], ';' );
+    auto throws = ssplit ( ssplit ( line, ':' )[1], ';' );
+
+    size_t minRed = 0;
+    size_t minGreen = 0;
+    size_t minBlue = 0;
 
     for ( const auto & thrw : throws )
-        if ( ! subgame ( thrw ) )
-            return 0;
+        subgame ( thrw, minRed, minGreen, minBlue );
     
-    return std::stoi(ssplit ( split[0], ' ' )[1]);
+    return minRed * minGreen * minBlue;
 }
 
 int main ( void ) {
