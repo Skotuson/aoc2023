@@ -1,4 +1,5 @@
 #include <iostream>
+#include <cctype>
 #include <vector>
 #include <string>
 #include <regex>
@@ -11,21 +12,42 @@ std::vector<std::string> ssplit ( const std::string & str, const char delim ) {
     std::vector<std::string> r;
     std::string tmp = "";
     for ( const auto & c : str ) {
-        tmp += c;
         if ( c == delim ) {
             r . push_back ( tmp );
             tmp = "";
-        }
+        } else tmp += c;
     }
     r . push_back ( tmp );
     return r;
 }
 
+bool subgame ( const std::string & thrw ) {
+    auto dices = ssplit ( thrw, ',' );
+    for ( const auto & dice : dices ) {
+        auto split = ssplit ( dice.substr(1, dice.size()), ' ' );
+        if ( split[1] == "red" )
+            if ( std::stoi(split[0]) > RED ) return false;
+        else if ( split[1] == "green" )
+            if ( std::stoi(split[0]) > GREEN ) return false;
+        else if ( split[1] == "blue" )
+            if ( std::stoi(split[0]) > BLUE ) return false;   
+    }
+    return true;
+}
+
 size_t game ( const std::string & line ) {
+    size_t r = 0;
     auto split = ssplit ( line, ':' );  
     auto game = ssplit ( split[0], ' ' );
-    size_t id = std::stoi(game[1].substr(0, game[1] . size ( ) - 1));
-    return 0;
+    size_t id = std::stoi(game[1]);
+
+    auto throws = ssplit ( split[1], ';' );
+
+    for ( const auto & thrw : throws )
+        if ( subgame ( thrw ) )
+            r += id;
+
+    return r;
 }
 
 int main ( void ) {
