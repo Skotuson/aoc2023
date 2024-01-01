@@ -25,12 +25,12 @@ bool subgame ( const std::string & thrw ) {
     auto dices = ssplit ( thrw, ',' );
     for ( const auto & dice : dices ) {
         auto split = ssplit ( dice.substr(1, dice.size()), ' ' );
-        if ( split[1] == "red" )
-            if ( std::stoi(split[0]) > RED ) return false;
-        else if ( split[1] == "green" )
-            if ( std::stoi(split[0]) > GREEN ) return false;
-        else if ( split[1] == "blue" )
-            if ( std::stoi(split[0]) > BLUE ) return false;   
+        if ( split[1] == "red" && std::stoi(split[0]) > RED )
+            return false;
+        if ( split[1] == "green" && std::stoi(split[0]) > GREEN )
+            return false;
+        if ( split[1] == "blue" && std::stoi(split[0]) > BLUE )
+            return false;   
     }
     return true;
 }
@@ -38,16 +38,13 @@ bool subgame ( const std::string & thrw ) {
 size_t game ( const std::string & line ) {
     size_t r = 0;
     auto split = ssplit ( line, ':' );  
-    auto game = ssplit ( split[0], ' ' );
-    size_t id = std::stoi(game[1]);
-
     auto throws = ssplit ( split[1], ';' );
 
     for ( const auto & thrw : throws )
-        if ( subgame ( thrw ) )
-            r += id;
-
-    return r;
+        if ( ! subgame ( thrw ) )
+            return 0;
+    
+    return std::stoi(ssplit ( split[0], ' ' )[1]);
 }
 
 int main ( void ) {
